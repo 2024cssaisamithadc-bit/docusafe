@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from "react";
 import "../App.css";
 import NotificationSettings from "../NotificationSettings";
 
-const API_URL = "http://localhost:5000/api/documents";
+const API_URL = `${import.meta.env.VITE_API_URL}/api/documents`;
 
 const categories = [
   "Other",

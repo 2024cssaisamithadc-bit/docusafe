@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const API_URL = "http://localhost:5000/api/push";
+const API_URL = `${import.meta.env.VITE_API_URL}/api/push`;
 
 function urlBase64ToUint8Array(base64String) {
   const padding = "=".repeat(
