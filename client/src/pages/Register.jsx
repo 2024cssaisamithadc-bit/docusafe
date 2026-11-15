@@ -25,7 +25,9 @@ export default function Register() {
   const handleRegister = async (e) => {
     e.preventDefault();
 
-    if (!form.name || !form.email || !form.password || !form.confirm) {
+    const cleanEmail = form.email.trim().toLowerCase();
+
+    if (!form.name || !cleanEmail || !form.password || !form.confirm) {
       setError("Please fill in all fields.");
       return;
     }
@@ -45,15 +47,18 @@ export default function Register() {
       setError("");
       setMessage("");
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          password: form.password
-        })
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/auth/register`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: form.name.trim(),
+            email: cleanEmail,
+            password: form.password
+          })
+        }
+      );
 
       const data = await response.json();
 
@@ -62,6 +67,7 @@ export default function Register() {
         return;
       }
 
+      setForm({ ...form, email: cleanEmail });
       setOtpSent(true);
       setMessage(data.message);
     } catch (err) {
@@ -74,7 +80,7 @@ export default function Register() {
   const handleVerify = async (e) => {
     e.preventDefault();
 
-    if (!otp) {
+    if (!otp.trim()) {
       setError("Please enter the OTP.");
       return;
     }
@@ -84,14 +90,17 @@ export default function Register() {
       setError("");
       setMessage("");
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/verify-otp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: form.email,
-          otp
-        })
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/auth/verify-otp`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: form.email.trim().toLowerCase(),
+            otp: otp.trim()
+          })
+        }
+      );
 
       const data = await response.json();
 
@@ -113,8 +122,12 @@ export default function Register() {
 
   return (
     <div className="auth-page">
-      <form className="auth-card" onSubmit={otpSent ? handleVerify : handleRegister}>
+      <form
+        className="auth-card"
+        onSubmit={otpSent ? handleVerify : handleRegister}
+      >
         <h1>DocuSafe</h1>
+
         <p className="sub">
           {otpSent ? "Verify your email" : "Create your account"}
         </p>
@@ -127,6 +140,7 @@ export default function Register() {
               name="name"
               value={form.name}
               onChange={handleChange}
+              required
             />
 
             <label>Email</label>
@@ -135,6 +149,8 @@ export default function Register() {
               name="email"
               value={form.email}
               onChange={handleChange}
+              autoComplete="email"
+              required
             />
 
             <label>Password</label>
@@ -143,6 +159,7 @@ export default function Register() {
               name="password"
               value={form.password}
               onChange={handleChange}
+              required
             />
 
             <label>Confirm password</label>
@@ -151,6 +168,7 @@ export default function Register() {
               name="confirm"
               value={form.confirm}
               onChange={handleChange}
+              required
             />
           </>
         ) : (
@@ -161,6 +179,7 @@ export default function Register() {
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
               maxLength="6"
+              required
             />
           </>
         )}
