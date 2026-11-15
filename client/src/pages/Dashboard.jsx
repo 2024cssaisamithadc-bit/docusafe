@@ -1,3 +1,4 @@
+
 import { useRef, useState, useEffect } from "react";
 import "../App.css";
 import NotificationSettings from "../NotificationSettings";
@@ -36,6 +37,7 @@ export default function Dashboard() {
   const [uploading, setUploading] = useState(false);
   const [search, setSearch] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
+  const [expiryDate, setExpiryDate] = useState("");
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
   const [editingDocument, setEditingDocument] = useState(null);
@@ -99,6 +101,10 @@ export default function Dashboard() {
     formData.append("document", selectedFile);
     formData.append("category", "Other");
 
+    if (expiryDate) {
+      formData.append("expiryDate", expiryDate);
+    }
+
     try {
       setUploading(true);
       setMessage("");
@@ -119,6 +125,7 @@ export default function Dashboard() {
       }
 
       setSelectedFile(null);
+      setExpiryDate("");
 
       if (fileInput.current) {
         fileInput.current.value = "";
@@ -374,6 +381,7 @@ export default function Dashboard() {
             accept=".pdf,.jpg,.jpeg,.png"
             onChange={(e) => {
               setSelectedFile(e.target.files[0] || null);
+              setExpiryDate("");
               setMessage("");
               setMessageType("");
             }}
@@ -390,6 +398,15 @@ export default function Dashboard() {
               </small>
             </div>
 
+            <div className="expiry-input">
+              <label>Document Expiry Date (Optional)</label>
+              <input
+                type="date"
+                value={expiryDate}
+                onChange={(e) => setExpiryDate(e.target.value)}
+              />
+            </div>
+
             <div>
               <button
                 onClick={handleUpload}
@@ -402,6 +419,7 @@ export default function Dashboard() {
                 <button
                   onClick={() => {
                     setSelectedFile(null);
+                    setExpiryDate("");
                     fileInput.current.value = "";
                   }}
                 >
@@ -517,7 +535,7 @@ export default function Dashboard() {
                       </small>
 
                       <small>
-                      Verification:{" "}
+                        Verification:{" "}
                         <span
                           className={
                             doc.verificationStatus === "Verified"
@@ -534,7 +552,7 @@ export default function Dashboard() {
                       {doc.verificationMessage && (
                         <small>{doc.verificationMessage}</small>
                       )}
-                                          </div>
+                    </div>
 
                     <button
                       onClick={() =>

@@ -88,6 +88,9 @@ router.post("/upload", auth, upload.single("document"), async (req, res) => {
       mimeType: req.file.mimetype,
       size: req.file.size,
       category: req.body.category || "Other",
+      expiryDate: req.body.expiryDate
+        ? new Date(`${req.body.expiryDate}T00:00:00`)
+        : null,
       filePath: req.file.path,
 
       verificationStatus: isValid ? "Verified" : "Needs Review",
