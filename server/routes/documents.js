@@ -13,6 +13,12 @@ import { sendPushNotification } from "../utils/pushNotifications.js";
 
 const router = express.Router();
 
+const uploadDir = path.resolve("uploads");
+
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
 router.get("/", auth, async (req, res) => {
   try {
     const documents = await Document.find({ user: req.userId }).sort({
@@ -27,8 +33,8 @@ router.get("/", auth, async (req, res) => {
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
+  cb(null, uploadDir);
+},
   filename: (req, file, cb) => {
     const uniqueName = crypto.randomUUID() + path.extname(file.originalname);
     cb(null, uniqueName);
@@ -137,10 +143,14 @@ try {
 
   } catch (err) {
     if (req.file) {
-      fs.unlink(req.file.path, () => {});
+  fs.unlink(req.file.path, (error) => {
+    if (error && error.code !== "ENOENT") {
+      console.error("File cleanup failed:", error.message);
     }
+  });
+}
 
-    console.error("Upload error:", err.message);
+    console.error("Upload error:", err);
 
     res.status(500).json({
       message: "Document upload failed."
