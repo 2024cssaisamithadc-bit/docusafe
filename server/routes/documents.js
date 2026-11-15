@@ -8,6 +8,7 @@ import auth from "../middleware/auth.js";
 import Document from "../models/Document.js";
 import User from "../models/User.js";
 import { sendUploadEmail } from "../utils/emailService.js";
+import { checkExpiringDocuments } from "../utils/expiryReminder.js";
 import PushSubscription from "../models/PushSubscription.js";
 import { sendPushNotification } from "../utils/pushNotifications.js";
 
@@ -103,6 +104,7 @@ router.post("/upload", auth, upload.single("document"), async (req, res) => {
     });
 
     await newDocument.save();
+    await checkExpiringDocuments();
     const user = await User.findById(req.userId);
 
     if (user && user.email) {
@@ -286,6 +288,7 @@ router.put("/:id", auth, async (req, res) => {
     }
 
     await document.save();
+    await checkExpiringDocuments();
 
     res.json({
       message: "Document updated successfully.",

@@ -6,7 +6,7 @@ import {
   sendExpiredEmail
 } from "./emailService.js";
 
-const checkExpiringDocuments = async () => {
+export const checkExpiringDocuments = async () => {
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
